@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import RecipeItems from "./RecipeItems";
 import NoRecipe from "./NoRecipe";
-import { Link } from "react-router-dom";
+import { Link  } from "react-router-dom";
 
 
 const Recipes = () => {
   const [recipes, setRecipes] = useState([]);
-  useEffect(() => {
+  useEffect(async() => {
     const url = "/api/v1/recipes/index";
-    axios
+    const response = await axios
       .get(url)
       .then((response) => {
         setRecipes(response.data);

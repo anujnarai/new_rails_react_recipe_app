@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link , Redirect } from "react-router-dom";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const Recipe = () => {
   const { id } = useParams();
+  let navigate = useNavigate();
   let ingredientList = "No ingredients available";
   const [recipe, setRecipe] = useState({
     ingredients: "",
   });
 
-  useEffect(() => {
+  useEffect(async() => {
     const url = `/api/v1/show/${id}`;
-    axios
+    await axios
       .get(url)
       .then((response) => {
         setRecipe(response.data);
@@ -45,6 +46,20 @@ const Recipe = () => {
       addHtmlEntities(recipe.instruction)
     };
   }
+
+  const deleteRecipe = async() => {
+    const url = `/api/v1/destroy/${id}`;
+    const token = document.querySelector('meta[name="csrf-token"]').content
+
+    const response = await axios.delete(url, {
+      header: {
+        "X-CSRF-Token": token,
+        "Content-Type": "application/json"
+      }
+    })
+    console.log("RESPONSE", response)
+    response? navigate("/recipes") : ""
+  }
    
   return (
     <div className="">
@@ -72,7 +87,7 @@ const Recipe = () => {
             <div dangerouslySetInnerHTML={createMarkup()}/>
           </div>
           <div className="col-sm-12 col-lg-2">
-            <button type="button" className="btn btn-danger">
+            <button type="button" className="btn btn-danger" onClick={deleteRecipe }>
               Delete Recipe
             </button>
           </div>
